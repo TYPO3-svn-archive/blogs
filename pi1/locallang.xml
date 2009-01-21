@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_blogs_pi1&quot;</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="posted_header">posted on %s in</label>	
+			<label index="read_more_label">Read full article</label>
+			<label index="name_label">Name:</label>
+			<label index="email_label">Email:</label>
+			<label index="url_label">Website:</label>
+			<label index="submit_comment_label">Submit your comment</label>
+			<label index="comments_link_single">%s comment</label>
+			<label index="comments_link">%s comments</label>
+			<label index="comments_header_single">%s comment has been posted</label>
+			<label index="comments_header">%s comments have been posted</label>
+			<label index="category_header">Categories</label>
+			<label index="archive_header">Archive</label>
+			<label index="tags">Tags: %s</label>
+			<label index="no_listview_items_found">No blog entries found</label>
+			<label index="item_not_found">Blog entry not found</label>
+			<label index="no_tags_found">No tags found</label>
+		</languageKey>
+	</data>
+</T3locallang>

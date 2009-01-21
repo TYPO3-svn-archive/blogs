@@ -1,0 +1,76 @@
+<T3DataStructure>
+ 
+ <meta>
+       <langDisable>1</langDisable>
+ </meta>
+ <sheets>
+
+   <sDEF>
+   <ROOT>
+     <TCEforms>
+      <sheetTitle>Settings</sheetTitle>
+     </TCEforms>
+     <type>array</type>
+      <el>
+      
+      <WhatToShow>
+      	<TCEforms>
+      		<label>View:</label>
+      		<onChange>reload</onChange>
+      		 <config>
+		   	 	<type>select</type>
+		    	<items type="array">
+			 		<numIndex index="0" type="array">
+				    	<numIndex index="0">List</numIndex>
+				 		<numIndex index="1">list</numIndex>
+			 		</numIndex>
+			 		<numIndex index="1" type="array">
+				    	<numIndex index="0">Single</numIndex>
+				 		<numIndex index="1">single</numIndex>
+			 		</numIndex>
+			 		<numIndex index="2" type="array">
+			 			<numIndex index="0">Archive</numIndex>
+			 			<numIndex index="1">archive</numIndex>
+			 		</numIndex>
+			 		<numIndex indes="3" type="array">
+			 			<numIndex index="0">Tagcloud</numIndex>
+			 			<numIndex index="1">tagcloud</numIndex>			 			
+			 		</numIndex>
+				</items>
+			</config>
+      	</TCEforms>
+      </WhatToShow>
+      
+      <BlogStorage>
+      	<TCEforms>
+      		<label>Blog storage:</label>
+      		 <config>
+      		 	<type>group</type>
+      			<internal_type>db</internal_type>
+      			<allowed>pages</allowed>
+      			<size>1</size>
+      			<maxitems>1</maxitems>   
+      		</config>
+      	</TCEforms>
+      </BlogStorage>    		 
+      
+      <SingleView>
+      	<TCEforms>
+      		<label>Singleview page</label>
+      		<displayCond>FIELD:WhatToShow:=:list</displayCond>
+      		 <config>
+      		 	<type>group</type>
+      			<internal_type>db</internal_type>
+      			<allowed>pages</allowed>
+      			<size>1</size>
+      			<maxitems>1</maxitems>   
+      		</config>
+      	</TCEforms>
+      </SingleView>  	
+      
+     </el>
+   </ROOT>
+   </sDEF>
+
+ </sheets>
+</T3DataStructure>     
