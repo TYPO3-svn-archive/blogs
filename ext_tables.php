@@ -3,6 +3,7 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
+t3lib_extMgm::addStaticFile($_EXTKEY,'static/blogs/', 'Blogs');
 t3lib_extMgm::allowTableOnStandardPages('tx_blogs_categories');
 
 $TCA['tx_blogs_categories'] = array (

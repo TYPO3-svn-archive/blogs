@@ -60,12 +60,15 @@ class tx_blogs_pi1 extends tslib_pibase {
 
 			// Check configuration, we need at least a storage container specified
 		$this->blogStorage = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'BlogStorage');
-		if(!isset($this->blogStorage)) return $this->pi_getLL('no_storage_selected');
+		if(empty($this->blogStorage)) return $this->pi_getLL('no_storage_selected');
 		
 			// .. and a Template
-		if(!isset($this->conf['templateFile'])) return $this->pi_getLL('no_template_selected');
+		if(!isset($this->conf['templateFile'])) return $this->pi_getLL('no_static_template');
 		$this->templateFile = $this->cObj->fileResource($this->conf['templateFile']);
-	
+			
+			// Set listview page, if not set in TypoScript, use default
+		(empty($this->conf['listViewPage'])) ? $this->listViewPage = $GLOBALS['TSFE']->id : $this->listViewPage = $this->conf['listViewPage'];
+
 			// Get content
 		$content = $this->whatToShow();
 
@@ -111,7 +114,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$singleView = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'SingleView');;
 		if(!isset($singleView)) return $this->pi_getLL('no_singleview_page_selected');
 		
-			// Initilialise filter
+			// Initialise
 		$filter = '';
 		
 			// Category filter
@@ -133,10 +136,11 @@ class tx_blogs_pi1 extends tslib_pibase {
 			'tx_blogs_items.uid, tx_blogs_items.title, tx_blogs_items.author, tx_blogs_items.author_email, tx_blogs_items.teaser, 
 			tx_blogs_items.tags, tx_blogs_items.crdate, tx_blogs_categories.uid AS category_id, tx_blogs_categories.title AS category_title',
 			'tx_blogs_items, tx_blogs_categories',
-			'tx_blogs_items.category = tx_blogs_categories.uid' . $this->cObj->enableFields('tx_blogs_items') . $filter,
+			'tx_blogs_items.category = tx_blogs_categories.uid AND tx_blogs_items.pid = '.$this->blogStorage.' AND tx_blogs_categories.pid = '.$this->blogStorage .  
+			$this->cObj->enableFields('tx_blogs_items') . $filter,
 			'',
 			'crdate DESC',
-			5
+			$this->conf['resultsPerPage']
 		);
 
 			// Result check
@@ -162,7 +166,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 					'###TITLE###' => $result['title'],
 					'###COMMENTS###' => ($comments[0]['count'] == 1) ? str_replace('%s', $comments[0]['count'], $this->pi_getLL('comments_link_single')) : str_replace('%s', $comments[0]['count'], $this->pi_getLL('comments_link')),
 					'###AUTHOR_EMAIL###' => $result['author_email'],
-					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('categoryid' => $result['category_id']))),
+					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result['category_id']))),
 					'###CATEGORY###' => $result['category_title'],
 					'###COMMENTS_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid']))).'#comments', 
 					'###AUTHOR###' => $result['author'], 
@@ -232,7 +236,8 @@ class tx_blogs_pi1 extends tslib_pibase {
 			'tx_blogs_items.uid, tx_blogs_items.title, tx_blogs_items.author, tx_blogs_items.author_email, 
 			tx_blogs_items.tags, tx_blogs_items.crdate, tx_blogs_items.bodytext, tx_blogs_categories.uid AS category_id, tx_blogs_categories.title AS category_title',
 			'tx_blogs_items, tx_blogs_categories',
-			'tx_blogs_items.uid = '.(int) $this->piVars['itemid'] .' AND tx_blogs_items.category = tx_blogs_categories.uid '.$this->cObj->enableFields('tx_blogs_items')
+			'tx_blogs_items.uid = '.(int) $this->piVars['itemid'] .' AND tx_blogs_items.category = tx_blogs_categories.uid AND tx_blogs_items.pid = '.$this->blogStorage .' AND
+			tx_blogs_categories.pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_items')
 		);
 
 			// Result check
@@ -244,7 +249,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				'name, url, crdate, bodytext',
 				'tx_blogs_comments',
-				'item_id = '.(int) $this->piVars['itemid'] . $this->cObj->enableFields('tx_blogs_comments'),
+				'item_id = '.(int) $this->piVars['itemid'].' AND pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_comments'),
 				'',
 				'crdate DESC'
 			);
@@ -283,7 +288,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 
 				// Loop through tags and create a clickable link which points to the listview and filters on that tag
 			foreach($tags as $key => &$tag) {
-				$tags[$key] = '<a href="'.$this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('tag' => trim($tag)))).'">'.trim($tag).'</a>';
+				$tags[$key] = '<a href="'.$this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('tag' => trim($tag)))).'">'.trim($tag).'</a>';
 			}
 
 				// Now fill the markerArray with the item data
@@ -292,7 +297,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###AUTHOR_EMAIL###' => $result[0]['author_emai l'],
 				'###AUTHOR###' => $result[0]['author'],
 				'###DATE###' => str_replace('%s', date('j F Y', $result[0]['crdate']), $this->pi_getLL('posted_header')),
-				'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('categoryid' => $result[0]['category_id']))),
+				'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result[0]['category_id']))),
 				'###CATEGORY###' => $result[0]['category_title'],
 				'###COMMENTS_LINK###' => '#comments',		
 				'###COMMENTS###' => (count($results) == 1) ? str_replace('%s', count($results), $this->pi_getLL('comments_link_single')) : str_replace('%s', count($results), $this->pi_getLL('comments_link')),
@@ -343,7 +348,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'crdate',
 			'tx_blogs_items',
-			'1 = 1 '.$this->cObj->enableFields('tx_blogs_items'),
+			'pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_items'),
 			'',
 			'crdate DESC'
 		);
@@ -376,7 +381,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				foreach($monthArray as $month => $count) {
 						// Fill markerArray		
 					$markerArray = array(
-						'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('year' => $year, 'month' => $monthNo))),
+						'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('year' => $year, 'month' => $monthNo))),
 						'###DATE###' => $month.' '.$year,
 						'###POST_COUNT###' => $count
 					);
@@ -390,7 +395,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'uid, title',
 			'tx_blogs_categories',
-			'1 = 1 '.$this->cObj->enableFields('tx_blogs_categories'),
+			'pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_categories'),
 			'',
 			'title ASC'
 		);
@@ -407,11 +412,11 @@ class tx_blogs_pi1 extends tslib_pibase {
 				$count = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 					'count(*) as count',
 					'tx_blogs_items',
-					'category = '.$result['uid'] . $this->cObj->enableFields('tx_blogs_items')
+					'category = '.$result['uid'].' AND pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_items')
 				);
 					// Fill a fresh markerArray
 				$markerArray = array(
-					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('categoryid' => $result['uid']))),
+					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result['uid']))),
 					'###CATEGORY_TITLE###' => $result['title'],
 					'###POST_COUNT###' => $count[0]['count']
 				);
@@ -441,7 +446,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'tags',
 			'tx_blogs_items',
-			'1 = 1 '.$this->cObj->enableFields('tx_blogs_items')
+			'pid = '.$this->blogStorage . $this->cObj->enableFields('tx_blogs_items')
 		);
 	
 			// Result check
@@ -494,7 +499,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		
 				// Now loop through final tag array and create the content
 			foreach($tags as $tag => $fontSize) {
-				$markerArray['###TAGS###'] .= "\n".'<span style="font-size: '.$fontSize.'px"><a href="'.$this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('tag' => $tag))).'" >'.$tag.'</a></span>'."\n";
+				$markerArray['###TAGS###'] .= "\n".'<span style="font-size: '.$fontSize.'px"><a href="'.$this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('tag' => $tag))).'" >'.$tag.'</a></span>'."\n";
 			}
 		} else {
 				// No results

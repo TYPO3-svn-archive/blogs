@@ -1,7 +1,122 @@
-<!-- ###LISTVIEW###
+<!-- ###LISTVIEW### 
 	start -->
 	
+	<!-- ###ITEM_SUBPART###
+		start -->
+	<div class="blogs_teaserContainer">
+		<h2>###TITLE###</h2>
+		<div class="blogs_entryInfo">
+			<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> ###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a> <a href="###COMMENTS_LINK###">###COMMENTS###</a>
+		</div>
+		<div class="blogs_bodyText">###TEASER###</div>
+		<div class="blogs_readMoreLink"><a href="###READ_MORE_LINK###">###READ_MORE_LABEL###</a></div>
+	</div>
+	<!--  ###ITEM_SUBPART###
+		end -->
 	
-	rdgdrg
+	<div id="blogs_pageBrowser">
+		###PAGE_BROWSER###
+	</div>
+	
 <!-- ###LISTVIEW###
 	end -->
+	
+	
+	
+	
+	
+<!-- ###SINGLEVIEW###
+	start -->
+	
+	<div class="blogs_entryContainer">
+		<h2>###TITLE###</h2>
+		<div class="blogs_entryInfo">
+			<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> ###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a> <a href="###COMMENTS_LINK###">###COMMENTS###</a>
+		</div>
+		<div class="blogs_bodyText">###BODYTEXT###</div>
+		<div class="blogs_Tags">###TAGS###</div>
+	</div>
+	
+	<div class="blogs_commentWrap">
+		<a name="comments"></a>
+		<h2>###COMMENTS_HEADER###</h2>
+		
+		<!-- ###COMMENT_SUBPART###
+			start -->
+		<div class="blogs_commentContainer-###ODD_EVEN###">
+			<div class="blogs_commentContent">
+				<div class="blogs_commentHeader">###NAME### ###COMMENT_DATE###</div>
+				<p>###BODYTEXT###</p>
+			</div>	
+		</div>	
+		<!-- ###COMMENT_SUBPART###
+			end -->
+			
+		<div class="blogs_commentForm">
+			<form method="POST" action="###FORM_ACTION###">
+				<label for="tx_blogs_pi1_name">###NAME_LABEL###</label><input name="tx_blogs_pi1[name]" id="tx_blogs_pi1_name" /><br />
+				<label for="tx_blogs_pi1_email">###EMAIL_LABEL###</label><input name="tx_blogs_pi1[email]" id="tx_blogs_pi1_email" /><br />
+				<label for="tx_blogs_pi1_url">###URL_LABEL###</label><input name="tx_blogs_pi1[url]" id="tx_blogs_pi1_url" /><br />
+				<textarea rows="10" cols="30" name="tx_blogs_pi1[bodytext]"></textarea><br />
+				
+				<!--###CAPTCHA_INSERT### -->
+				<label for="tx_blogs_pi1_captcha_response">###SR_FREECAP_NOTICE###</label>
+				###SR_FREECAP_CANT_READ###
+				<br />
+				<input type="text" size="15" id="tx_blogs_pi1_captcha_response" name="tx_blogs_pi1[captcha_response]" title="###SR_FREECAP_NOTICE###">###SR_FREECAP_IMAGE###<br />
+				###SR_FREECAP_ACCESSIBLE###
+				<!-- ###CAPTCHA_INSERT### -->
+				
+				<input type="hidden" name="tx_blogs_pi1[id]" value="###ID###" />
+				<input type="submit" name="tx_blogs_pi1[submit]" value="###SUBMIT_COMMENT###" />				
+			</form>
+		</div>
+	</div>
+	
+<!-- ###SINGLEVIEW###
+	end -->	
+	
+	
+	
+
+
+<!-- ###ARCHIVEVIEW### 
+ 	start -->
+ 	
+	<div class="blog_archiveWrap">
+		
+		<h2>###ARCHIVE_HEADER###</h2>
+		<ul>
+		<!-- ###DATEVIEW_SUBPART###
+			start -->
+			<li><a href="###CATEGORY_LINK###">###DATE###</a> (###POST_COUNT###)</li>
+		<!--  ###DATEVIEW_SUBPART###
+			end -->
+		
+		</ul>
+		
+		<h2>###CATEGORY_HEADER###</h2>
+		<ul>
+		<!-- ###CATEGORY_SUBPART### 
+		 	start -->
+			<li><a href="###CATEGORY_LINK###">###CATEGORY_TITLE###</a> (###POST_COUNT###)</li>
+		<!-- ###CATEGORY_SUBPART###
+			end -->
+		</ul>
+	</div> 	
+ 	
+<!-- ###ARCHIVEVIEW###
+	end -->	
+	
+	
+	
+	
+<!-- ###TAGCLOUDVIEW###
+	start -->
+	
+	<div class="blog_tagCloud">
+		###TAGS###
+	</div>
+	
+<!-- ###TAGCLOUDVIEW###
+	end -->	

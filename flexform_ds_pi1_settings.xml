@@ -8,32 +8,32 @@
    <sDEF>
    <ROOT>
      <TCEforms>
-      <sheetTitle>Settings</sheetTitle>
+      <sheetTitle>LLL:EXT:blogs/pi1/locallang.xml:settings.label</sheetTitle>
      </TCEforms>
      <type>array</type>
       <el>
       
       <WhatToShow>
       	<TCEforms>
-      		<label>View:</label>
+      		<label>LLL:EXT:blogs/pi1/locallang.xml:settings.view</label>
       		<onChange>reload</onChange>
       		 <config>
 		   	 	<type>select</type>
 		    	<items type="array">
 			 		<numIndex index="0" type="array">
-				    	<numIndex index="0">List</numIndex>
+				    	<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.listview</numIndex>
 				 		<numIndex index="1">list</numIndex>
 			 		</numIndex>
 			 		<numIndex index="1" type="array">
-				    	<numIndex index="0">Single</numIndex>
+				    	<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.singleview</numIndex>
 				 		<numIndex index="1">single</numIndex>
 			 		</numIndex>
 			 		<numIndex index="2" type="array">
-			 			<numIndex index="0">Archive</numIndex>
+			 			<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.archive</numIndex>
 			 			<numIndex index="1">archive</numIndex>
 			 		</numIndex>
 			 		<numIndex indes="3" type="array">
-			 			<numIndex index="0">Tagcloud</numIndex>
+			 			<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.tagcloud</numIndex>
 			 			<numIndex index="1">tagcloud</numIndex>			 			
 			 		</numIndex>
 				</items>
@@ -43,7 +43,7 @@
       
       <BlogStorage>
       	<TCEforms>
-      		<label>Blog storage:</label>
+      		<label>LLL:EXT:blogs/pi1/locallang.xml:settings.storage</label>
       		 <config>
       		 	<type>group</type>
       			<internal_type>db</internal_type>
@@ -52,11 +52,11 @@
       			<maxitems>1</maxitems>   
       		</config>
       	</TCEforms>
-      </BlogStorage>    		 
+      </BlogStorage>    		  	
       
       <SingleView>
       	<TCEforms>
-      		<label>Singleview page</label>
+      		<label>LLL:EXT:blogs/pi1/locallang.xml:settings.singleviewpage</label>
       		<displayCond>FIELD:WhatToShow:=:list</displayCond>
       		 <config>
       		 	<type>group</type>
@@ -66,7 +66,7 @@
       			<maxitems>1</maxitems>   
       		</config>
       	</TCEforms>
-      </SingleView>  	
+      </SingleView>        
       
      </el>
    </ROOT>

@@ -6,6 +6,14 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
+			<label index="settings.label">Settings</label>
+			<label index="settings.storage">Blog storage</label>
+			<label index="settings.view">What to show</label>
+			<label index="settings.listview">Listview</label>
+			<label index="settings.singleview">Singleview</label>
+			<label index="settings.archive">Archive</label>
+			<label index="settings.tagcloud">Tagcloud</label>
+			<label index="settings.singleviewpage">Singleview page</label>
 			<label index="posted_header">posted on %s in</label>	
 			<label index="read_more_label">Read full article</label>
 			<label index="name_label">Name:</label>
@@ -23,6 +31,10 @@
 			<label index="item_not_found">Blog entry not found</label>
 			<label index="no_tags_found">No tags found</label>
 			<label index="wrong_captcha">Captcha didnt match</label>
+			<label index="no_storage_selected">Please select the storage folder for the blog items in the Flexform.</label>
+			<label index="no_static_template">Please include the static template 'Blogs' to your main template.</label>
+			<label index="no_type_selected">Please select what view to show in the Flexform.</label>
+			<label index="no_singleview_page_selected">Please select a singleview page in the Flexform.</label>
 		</languageKey>
 	</data>
 </T3locallang>

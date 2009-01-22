@@ -1,0 +1,21 @@
+plugin.tx_blogs_pi1 {
+	# cat=plugin.blogs: Basic; type=string; label=Template file
+	templateFile = EXT:blogs/pi1/template.html
+
+	# cat=plugin.blogs: Basic; type=int+; label=Page id where the listview is located
+	listViewPage =
+
+	# cat=plugin.blogs: Basic; type=int+; label=Results per page
+	resultsPerPage = 5
+
+	tagCloud {
+		# cat=plugin.blogs: Basic; type=int+; label=Amount of tags in tagcloud
+		maxTags = 20
+
+		# cat=plugin.blogs: Basic; type=int+; label=Min fontsize in tagcloud
+		minFontSize = 8
+
+		# cat=plugin.blogs: Basic; type=int+; label=Max fontsize in tagcloud
+		maxFontSize = 18
+	}
+}
