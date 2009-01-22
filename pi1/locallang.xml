@@ -22,6 +22,7 @@
 			<label index="no_listview_items_found">No blog entries found</label>
 			<label index="item_not_found">Blog entry not found</label>
 			<label index="no_tags_found">No tags found</label>
+			<label index="wrong_captcha">Captcha didnt match</label>
 		</languageKey>
 	</data>
 </T3locallang>

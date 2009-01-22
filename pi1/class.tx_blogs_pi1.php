@@ -54,24 +54,28 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
-		$this->pi_initPIflexForm();	// load flexform	
+		
+			// Get Flexform
+		$this->pi_initPIflexForm();	
 
-		// check configuration
+			// Check configuration, we need at least a storage container specified
 		$this->blogStorage = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'BlogStorage');
 		if(!isset($this->blogStorage)) return $this->pi_getLL('no_storage_selected');
 		
+			// .. and a Template
 		if(!isset($this->conf['templateFile'])) return $this->pi_getLL('no_template_selected');
 		$this->templateFile = $this->cObj->fileResource($this->conf['templateFile']);
 	
+			// Get content
 		$content = $this->whatToShow();
 
 		return $this->pi_wrapInBaseClass($content);
 	}
 	
 	/**
-	 * Decides what to show
+	 * Decides what to show by importing values set in Flexform
 	 * 
-	 * @return	The content that is displayed on the website
+	 * @return	string		The content that is displayed on the website
 	 */
 	protected function whatToShow() {
 		$whatToShow = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'WhatToShow');	
@@ -89,6 +93,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				$content = $this->tagcloudView();
 			break;
 			default:
+					// Show error message
 				$content = $this->pi_getLL('no_type_selected');
 		}
 		
@@ -96,24 +101,26 @@ class tx_blogs_pi1 extends tslib_pibase {
 	}
 	
 	/**
-	 * Listview function
+	 * This method returns the listview. Can filter on tags, categories and date. Default shows latest items,
+	 * amount specified in TypoScript/Flexform (to do)
 	 * 
-	 * @return	Listview content
+	 * @return	string		The listview
 	 */
 	protected function listView() {
-		// check configuration
+			// Check configuration, we need to know what the singleview page will be
 		$singleView = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'SingleView');;
 		if(!isset($singleView)) return $this->pi_getLL('no_singleview_page_selected');
 		
+			// Initilialise filter
 		$filter = '';
 		
-		// check if we need to filter on categories
+			// Category filter
 		if(isset($this->piVars['categoryid']) && is_numeric($this->piVars['categoryid'])) $filter = ' AND tx_blogs_items.category = '.$this ->piVars['categoryid'];
 		
-		// check if we need to filter on tags
-		if(isset($this->piVars['tag'])) $filter = ' AND tags LIKE \'%'.$this->piVars['tag'].'%\'';
+			// Tag filter
+		if(isset($this->piVars['tag'])) $filter = ' AND tags LIKE \'%'.mysql_real_escape_string($this->piVars['tag']).'%\'';
 	
-		// check if we need to filter on dates
+			// Date filter
 		if(isset($this->piVars['year']) && isset($this->piVars['month']) && is_numeric($this->piVars['year']) && is_numeric($this->piVars['month'])) {
 			$crdateMin = mktime(0, 0, 0, $this->piVars['month'], 0, $this->piVars['year']);
 			$crdateMax = mktime(0, 0, 0, $this->piVars['month'] + 1, 0, $this->piVars['year']);
@@ -121,7 +128,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			$filter = ' AND tx_blogs_items.crdate < '.$crdateMax.' AND tx_blogs_items.crdate >= '.$crdateMin;
 		}
 		
-		// fetch all latest items
+			// Execute the query
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'tx_blogs_items.uid, tx_blogs_items.title, tx_blogs_items.author, tx_blogs_items.author_email, tx_blogs_items.teaser, 
 			tx_blogs_items.tags, tx_blogs_items.crdate, tx_blogs_categories.uid AS category_id, tx_blogs_categories.title AS category_title',
@@ -132,23 +139,25 @@ class tx_blogs_pi1 extends tslib_pibase {
 			5
 		);
 
+			// Result check
 		if(count($results)) {
+				// Set template
 			$template = $this->cObj->getSubpart($this->templateFile, '###LISTVIEW###');
 			
-			// item subpart
+				// Item subpart
 			$items = $this->cObj->getSubpart($template, '###ITEM_SUBPART###');
 			$subpartArray = array('###ITEM_SUBPART###' => '');
 		
-			// loop through results
+				// Loop through resultset
 			foreach($results as $result) {
-				// find how many comments were posted for this item
+					// Find out how many comments were posted for this entry
 				$comments = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 					'count(*) as count',
 					'tx_blogs_comments',
 					'item_id = '.$result['uid'] . $this->cObj->enableFields('tx_blogs_comments')
 				);
 			
-				// recreate markerarray and fill it
+					// Create a fresh markerArray and fill it
 				$markerArray = array(
 					'###TITLE###' => $result['title'],
 					'###COMMENTS###' => ($comments[0]['count'] == 1) ? str_replace('%s', $comments[0]['count'], $this->pi_getLL('comments_link_single')) : str_replace('%s', $comments[0]['count'], $this->pi_getLL('comments_link')),
@@ -162,29 +171,45 @@ class tx_blogs_pi1 extends tslib_pibase {
 					'###READ_MORE_LABEL###' => $this->pi_getLL('read_more_label'),
 					'###READ_MORE_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid'])))
 				);
+					// Substitute it
  				$subpartArray['###ITEM_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($items, $markerArray);
 			}
 			
-			$markerArray = array();
+				/// To do: pagebrowser
+			$markerArray = array('###PAGE_BROWSER###' => '');
+				// Substitute the whole thing
 			$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 		} else {
+				// No items were found
 			return $this->pi_getLL('no_listview_items_found');
 		}
-
+	
 		return $content;
 	}
 	
 	/**
-	 * Singleview function
+	 * This method prints the singleview. Includes a commentform (featuring Captcha support if sr_freecap is installed)
 	 * 
-	 * @return	Singleview page
+	 * @return	string		The singleview page
 	 */
 	protected function singleView() {
+			// Check GET vars
 		if(!isset($this->piVars['itemid']) || !is_numeric($this->piVars['itemid'])) return 'item not found';
+
+			// Check if sr_freecap is loaded
+		if(t3lib_extMgm::isLoaded('sr_freecap')) {
+				// It is, include it
+			require_once(t3lib_extMgm::extPath('sr_freecap').'pi2/class.tx_srfreecap_pi2.php');
+				// Instantiate
+			$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
+		}				
 		
-		// check if the comment form was submit
+			// Comment form handler
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
-			// to do: validation
+				// If sr_freecap is installed, we check if the value matched the image
+			if(is_object($this->freeCap) && !$this->freeCap->checkWord($this->piVars['captcha_response'])) return $this->pi_getLL('wrong_captcha');
+
+				// Build insert array
 			$insertFields = array(
 				'name' => $this->piVars['name'],
 				'pid' => $this->blogStorage,
@@ -194,13 +219,15 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'item_id' => $this->piVars['id'],
 				'crdate' => time()
 			);
+			
+				// Insert it
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 				'tx_blogs_comments',
 				$insertFields
-			);
+			);	
 		}
 	
-		// select item
+			// Select the specified item
 		$result = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'tx_blogs_items.uid, tx_blogs_items.title, tx_blogs_items.author, tx_blogs_items.author_email, 
 			tx_blogs_items.tags, tx_blogs_items.crdate, tx_blogs_items.bodytext, tx_blogs_categories.uid AS category_id, tx_blogs_categories.title AS category_title',
@@ -208,11 +235,12 @@ class tx_blogs_pi1 extends tslib_pibase {
 			'tx_blogs_items.uid = '.(int) $this->piVars['itemid'] .' AND tx_blogs_items.category = tx_blogs_categories.uid '.$this->cObj->enableFields('tx_blogs_items')
 		);
 
-		// check results
+			// Result check
 		if(count($result)) {
+				// Get template
 			$template = $this->cObj->getSubpart($this->templateFile, '###SINGLEVIEW###');
 			
-			// comment query
+				// Get all comments
 			$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 				'name, url, crdate, bodytext',
 				'tx_blogs_comments',
@@ -221,17 +249,20 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'crdate DESC'
 			);
 		
-			// check for comments
+				// Result check for comments
 			if(count($results)) {
+					// Comment subpart
 				$comments = $this->cObj->getSubpart($template, '###COMMENT_SUBPART###');
 				$subpartArray = array('###COMMENT_SUBPART###' => '');
 				
-				// odd or even colours
+					// Odd or even classname for the wrap
 				$oddEven = 'even';
 				
-				// loop through comments and add them to subpart
+					// Loop through comments and add them to the subpart
 				foreach($results as $comment) {
+						// Odd or even?
 					($oddEven == 'even') ? $oddEven = 'odd' : $oddEven = 'even';
+						// Fill a fresh markerArray
 					$markerArray = array(
 						'###NAME###' => htmlspecialchars($comment['name']),
 						'###URL###' => htmlspecialchars($comment['url']),
@@ -239,15 +270,23 @@ class tx_blogs_pi1 extends tslib_pibase {
 						'###BODYTEXT###' => htmlspecialchars($comment['bodytext']),
 						'###ODD_EVEN###' => $oddEven
 					);
-					
+						// Substitute to subpart
 					$subpartArray['###COMMENT_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($comments, $markerArray);
 				}
 			} else {
-				// no comments, empty subpart
+					// No comments found, leave comment subpart empty
 				$subpartArray['###COMMENT_SUBPART###'] = '';
 			}
-			
-			// now fill the item markerarray
+		
+				// Create array out of the comma seperated tags
+			$tags = explode(',', $result[0]['tags']);
+
+				// Loop through tags and create a clickable link which points to the listview and filters on that tag
+			foreach($tags as $key => &$tag) {
+				$tags[$key] = '<a href="'.$this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('tag' => trim($tag)))).'">'.trim($tag).'</a>';
+			}
+
+				// Now fill the markerArray with the item data
 			$markerArray = array(
 				'###TITLE###' => $result[0]['title'],
 				'###AUTHOR_EMAIL###' => $result[0]['author_emai l'],
@@ -258,7 +297,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###COMMENTS_LINK###' => '#comments',		
 				'###COMMENTS###' => (count($results) == 1) ? str_replace('%s', count($results), $this->pi_getLL('comments_link_single')) : str_replace('%s', count($results), $this->pi_getLL('comments_link')),
 				'###COMMENTS_HEADER###' => (count($results) == 1) ? str_replace('%s', count($results), $this->pi_getLL('comments_header_single')) : str_replace('%s', count($results), $this->pi_getLL('comments_header')),
-				'###TAGS###' => str_replace('%s', $result[0]['tags'], $this->pi_getLL('tags')),
+				'###TAGS###' => str_replace('%s', implode(', ', $tags), $this->pi_getLL('tags')),
 				'###BODYTEXT###' => $result[0]['bodytext'],
 				'###FORM_ACTION###' => $this->pi_getPageLink($GLOBALS['TSFE']->id, '', array($this->prefixId => array('itemid' => $this->piVars['itemid']))),
 				'###ID###' => $this->piVars['itemid'],
@@ -268,31 +307,39 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###SUBMIT_COMMENT###' => $this->pi_getLL('submit_comment_label')
 			);
 			
-			// substitute the whole thing
+				// Show captcha fields in the commentform if sr_freecap is installed
+			if(is_object($this->freeCap)) {
+				$markerArray = array_merge($markerArray, $this->freeCap->makeCaptcha());
+			} else {
+					// Otherwise, leave this empty
+				$subpartArray['###CAPTCHA_INSERT###'] = '';
+			}
+			
+				// Substitute the whole thing
 			$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 			
-			// set meta tags
+				// Set our tags as META keywords to improve SEO
 			if(!empty($result[0]['tags'])) {
 				$GLOBALS['TSFE']->additionalHeaderData[] = '<meta name="keywords" content="'.$result[0]['tags'].'" />';
 			}
 		} else {
-			$content = $this->pi_getLL('item_not_found');
+				// Item wasn't found
+			return $this->pi_getLL('item_not_found');
 		}
 		
 		return $content;
 	}
 	
 	/**
-	 * Archive function
+	 * This method creates the archive view
 	 *  
-	 * @return	Archive view
+	 * @return	string		The archive content
 	 */
 	public function archiveView() {
+			// Template
 		$template = $this->cObj->getSubpart($this->templateFile, '###ARCHIVEVIEW###');
-	
-		// dateview
 			
-		// select the crdate of all items
+			// Select the crdate of all items
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'crdate',
 			'tx_blogs_items',
@@ -300,10 +347,10 @@ class tx_blogs_pi1 extends tslib_pibase {
 			'',
 			'crdate DESC'
 		);
-
+			// Initialise array
 		$datesArray = array();
 		
-		// loop through all of them and store the month/year
+			// Loop through all crdate's and convert the timestamp to year, month and month number. Save these values seperatly in $datesArray
 		foreach($results as $result) {
 			$year = date('Y', $result['crdate']);
 			$month = date('F', $result['crdate']);
@@ -312,34 +359,34 @@ class tx_blogs_pi1 extends tslib_pibase {
 			if(!is_array($datesArray[$year][$monthNo])) $datesArray[$year][$monthNo] = array();
 			
 			if(array_key_exists($month, $datesArray[$year][$monthNo])) {
-				$datesArray[$year][$monthNo][$month]++;	// increment amount if key already exists
+					// Increment amount if key already exists
+				$datesArray[$year][$monthNo][$month]++;	
 			} else {
 				$datesArray[$year][$monthNo][$month] = 1;	
 			}
 		}
 
-		// subpart
+			// Get dateview subpart
 		$categories = $this->cObj->getSubpart($template, '###DATEVIEW_SUBPART###');
 		$subpartArray = array('###DATEVIEW_SUBPART###' => '');
 
-		// loop through dates
+			// Loop through dates
 		foreach($datesArray as $year => $monthArray) {
 			foreach($monthArray as $monthNo => $monthArray) {
-				foreach($monthArray as $month => $count) {		
+				foreach($monthArray as $month => $count) {
+						// Fill markerArray		
 					$markerArray = array(
 						'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('year' => $year, 'month' => $monthNo))),
 						'###DATE###' => $month.' '.$year,
 						'###POST_COUNT###' => $count
 					);
-					
+						// Substitute to subpart
 					$subpartArray['###DATEVIEW_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($categories, $markerArray);
 				}
 			}
 		}
 		
-		// category view 
-		
-		// select all categories
+			// Now we want to select all categories
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'uid, title',
 			'tx_blogs_categories',
@@ -348,60 +395,68 @@ class tx_blogs_pi1 extends tslib_pibase {
 			'title ASC'
 		);
 
-		// check for results
+			// Result check
 		if(count($results)) {
-			// subpart
+				// Get subpart
 			$categories = $this->cObj->getSubpart($template, '###CATEGORY_SUBPART###');
 			$subpartArray['###CATEGORY_SUBPART###'] = '';
 			
-			// loop through results and build the list
+				// Loop through results
 			foreach($results as $result) {
+					// Find the amount of items posted in this category
 				$count = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 					'count(*) as count',
 					'tx_blogs_items',
 					'category = '.$result['uid'] . $this->cObj->enableFields('tx_blogs_items')
 				);
-				
+					// Fill a fresh markerArray
 				$markerArray = array(
 					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('categoryid' => $result['uid']))),
 					'###CATEGORY_TITLE###' => $result['title'],
 					'###POST_COUNT###' => $count[0]['count']
 				);
-				
+					// Substitute to subpart
 				$subpartArray['###CATEGORY_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($categories, $markerArray);
 			}
-			
+				// Fill static stuff
 			$markerArray = array(
 				'###CATEGORY_HEADER###' => $this->pi_getLL('category_header'),
 				'###ARCHIVE_HEADER###' => $this->pi_getLL('archive_header')
 			);
 			
-			// substitute everything
+				// Substitute everything
 			$content .= $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 		}
 		
 		return $content;
 	}
 	
+	/**
+	 * This method creates a tagcloud
+	 * 
+	 * @return	string		The tagcloud
+	 */
 	public function tagcloudView() {
-		// select all tags
+			// Select all tags
 		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'tags',
 			'tx_blogs_items',
 			'1 = 1 '.$this->cObj->enableFields('tx_blogs_items')
 		);
 	
-		// check for results
+			// Result check
 		if(count($results)) {
+				// Template
 			$template = $this->cObj->getSubpart($this->templateFile, '###TAGCLOUDVIEW###');
 			
-			$tagArray = array();	// init
+				// Initialise
+			$tagArray = array();
 			
-			// loop through results
+				// Loop through results
 			foreach($results as $result) {
-				// create array out of tags
+					// Create array out of the tags
 				$tags = explode(',', $result['tags']);
-				// loop through these tags and add them to $tagArray, if they exist we increment the count
+					// Loop through these tags and add them to $tagArray, if they exist we increment the count
 				foreach($tags as $tag) {
 					if(array_key_exists(strtolower(trim($tag)), $tagArray)) {
 						$tagArray[strtolower(trim($tag))]++;
@@ -410,46 +465,46 @@ class tx_blogs_pi1 extends tslib_pibase {
 					}
 				}
 			}
+				// Sort
+			arsort($tagArray);	
 
-			arsort($tagArray);	// sort it
-
-			// min and max font sizes from typoscript, if not set use default  values
+				// Min and max font sizes from TypoScript, if not set use default values
 			$minFontSize = (isset($this->conf['tagCloud.']['minFontSize'])) ? $this->conf['tagCloud.']['minFontSize'] : 8;
 			$maxFontSize = (isset($this->conf['tagCloud.']['maxFontSize'])) ? $this->conf['tagCloud.']['maxFontSize'] : 18;
-	
-			$difference = ($maxFontSize +1) - ($minFontSize + 1); 	// determine difference
-
-			$highestOccurance = max($tagArray);	// find highest occurance
-			
-			$tagArray = array_slice($tagArray, 0, $this->conf['tagCloud.']['maxTags'], true);	// only select the amount specified by maxTags in typoscript
+				// Determine difference
+			$difference = ($maxFontSize +1) - ($minFontSize + 1); 	
+				// Find highest occurance
+			$highestOccurance = max($tagArray);	
+				// only select the amount specified by maxTags in TypoScript
+			$tagArray = array_slice($tagArray, 0, $this->conf['tagCloud.']['maxTags'], true);	
 		
-			// loop through tag array and create final aray
+				// Loop through tag array and create final aray
 			foreach($tagArray as $tag => $occurance) {
 				$newTagArray[$tag] = $minFontSize + round(($occurance / $highestOccurance) * $difference, 0);
 			}
 
-			// shuffle array while preserving keys
-			$tags = array();	// new array
-			$keys = array_keys($newTagArray);	// select keys
-			shuffle($keys);	// shuffle them
+				// Shuffle array while preserving keys
+			$tags = array();
+			$keys = array_keys($newTagArray);	
+			shuffle($keys);	
 			foreach($keys as $key) {	
-				$tags[$key] = $newTagArray[$key];	// assign
-				unset($newTagArray[$key]);	// unset
+				$tags[$key] = $newTagArray[$key];	
+				unset($newTagArray[$key]);	
 			}
 		
-			// now loop through final tag array and create the content
+				// Now loop through final tag array and create the content
 			foreach($tags as $tag => $fontSize) {
 				$markerArray['###TAGS###'] .= "\n".'<span style="font-size: '.$fontSize.'px"><a href="'.$this->pi_getPageLink($this->conf['listViewPage'], '', array($this->prefixId => array('tag' => $tag))).'" >'.$tag.'</a></span>'."\n";
 			}
 		} else {
+				// No results
 			$markerArray['###TAGS###'] = $this->pi_getLL('no_tags_found');
 		}
-		
+			// Substitute whole thing
 		$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray);
 		
 		return $content;
 	}
-	
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/blogs/pi1/class.tx_blogs_pi1.php'])	{
