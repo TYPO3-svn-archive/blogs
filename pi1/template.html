@@ -1,6 +1,6 @@
 <!-- ###LISTVIEW### 
 	start -->
-	
+
 	<!-- ###ITEM_SUBPART###
 		start -->
 	<div class="blogs_teaserContainer">
@@ -27,7 +27,10 @@
 	
 <!-- ###SINGLEVIEW###
 	start -->
-	
+	<!-- ###ERROR_SUBPART### 
+		start -->
+		<div class="blogs_errorMessage">###ERROR###</div>
+	<!-- ###ERROR_SUBPART### -->
 	<div class="blogs_entryContainer">
 		<h2>###TITLE###</h2>
 		<div class="blogs_entryInfo">
@@ -54,18 +57,20 @@
 			
 		<div class="blogs_commentForm">
 			<form method="POST" action="###FORM_ACTION###">
-				<label for="tx_blogs_pi1_name">###NAME_LABEL###</label><input name="tx_blogs_pi1[name]" id="tx_blogs_pi1_name" /><br />
-				<label for="tx_blogs_pi1_email">###EMAIL_LABEL###</label><input name="tx_blogs_pi1[email]" id="tx_blogs_pi1_email" /><br />
-				<label for="tx_blogs_pi1_url">###URL_LABEL###</label><input name="tx_blogs_pi1[url]" id="tx_blogs_pi1_url" /><br />
-				<textarea rows="10" cols="30" name="tx_blogs_pi1[bodytext]"></textarea><br />
+				<label for="tx_blogs_pi1_name">###NAME_LABEL###</label><input name="tx_blogs_pi1[name]" id="tx_blogs_pi1_name" value="###NAME_VALUE###" /><br />
+				<label for="tx_blogs_pi1_email">###EMAIL_LABEL###</label><input name="tx_blogs_pi1[email]" id="tx_blogs_pi1_email" value="###EMAIL_VALUE###" /><br />
+				<label for="tx_blogs_pi1_url">###URL_LABEL###</label><input name="tx_blogs_pi1[url]" id="tx_blogs_pi1_url" value="###URL_VALUE###" /><br />
+				<textarea rows="10" cols="30" name="tx_blogs_pi1[bodytext]">###BODYTEXT_VALUE###</textarea><br />
 				
-				<!--###CAPTCHA_INSERT### -->
+				<!--###CAPTCHA_INSERT### 
+					start -->
 				<label for="tx_blogs_pi1_captcha_response">###SR_FREECAP_NOTICE###</label>
 				###SR_FREECAP_CANT_READ###
 				<br />
 				<input type="text" size="15" id="tx_blogs_pi1_captcha_response" name="tx_blogs_pi1[captcha_response]" title="###SR_FREECAP_NOTICE###">###SR_FREECAP_IMAGE###<br />
 				###SR_FREECAP_ACCESSIBLE###
-				<!-- ###CAPTCHA_INSERT### -->
+				<!-- ###CAPTCHA_INSERT### 
+					end -->
 				
 				<input type="hidden" name="tx_blogs_pi1[id]" value="###ID###" />
 				<input type="submit" name="tx_blogs_pi1[submit]" value="###SUBMIT_COMMENT###" />				

@@ -11,6 +11,17 @@ plugin.tx_blogs_pi1 {
 	# Number of results per page
 	resultsPerPage = {$plugin.tx_blogs_pi1.resultsPerPage}
 
+	listView {
+		dateFormat = {$plugin.tx_blogs_pi1.listView.dateFormat}
+	}
+	
+	singleView {
+		dateFormat = {$plugin.tx_blogs_pi1.singleView.dateFormat}
+		comments {
+			dateFormat = {$plugin.tx_blogs_pi1.singleView.comments.dateFormat}
+		}
+	}
+
 	tagCloud {
 		maxTags = {$plugin.tx_blogs_pi1.tagCloud.maxTags}
 

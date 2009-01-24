@@ -35,6 +35,8 @@
 			<label index="no_static_template">Please include the static template 'Blogs' to your main template.</label>
 			<label index="no_type_selected">Please select what view to show in the Flexform.</label>
 			<label index="no_singleview_page_selected">Please select a singleview page in the Flexform.</label>
+			<label index="empty_fields">Some fields were missing</label>
+			<label index="invalid_email">This doesn't look like a valid email address</label>
 		</languageKey>
 	</data>
 </T3locallang>

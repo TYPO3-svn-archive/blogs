@@ -66,7 +66,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 		if(!isset($this->conf['templateFile'])) return $this->pi_getLL('no_static_template');
 		$this->templateFile = $this->cObj->fileResource($this->conf['templateFile']);
 			
-			// Set listview page, if not set in TypoScript, use default
+			// Set listview page, if not set in TypoScript, use current
 		(empty($this->conf['listViewPage'])) ? $this->listViewPage = $GLOBALS['TSFE']->id : $this->listViewPage = $this->conf['listViewPage'];
 
 			// Get content
@@ -170,7 +170,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 					'###CATEGORY###' => $result['category_title'],
 					'###COMMENTS_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid']))).'#comments', 
 					'###AUTHOR###' => $result['author'], 
-					'###DATE###' => str_replace('%s', date('j F Y', $result['crdate']), $this->pi_getLL('posted_header')),
+					'###DATE###' => str_replace('%s', date($this->conf['listView.']['dateFormat'], $result['crdate']), $this->pi_getLL('posted_header')),
 					'###TEASER###' => $result['teaser'],
 					'###READ_MORE_LABEL###' => $this->pi_getLL('read_more_label'),
 					'###READ_MORE_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid'])))
@@ -208,27 +208,40 @@ class tx_blogs_pi1 extends tslib_pibase {
 			$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
 		}				
 		
+			// Init error
+			$error = '';
+			
 			// Comment form handler
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				// If sr_freecap is installed, we check if the value matched the image
-			if(is_object($this->freeCap) && !$this->freeCap->checkWord($this->piVars['captcha_response'])) return $this->pi_getLL('wrong_captcha');
+			if(is_object($this->freeCap) && !$this->freeCap->checkWord($this->piVars['captcha_response'])) $error = $this->pi_getLL('wrong_captcha');
 
-				// Build insert array
-			$insertFields = array(
-				'name' => $this->piVars['name'],
-				'pid' => $this->blogStorage,
-				'email' => $this->piVars['email'],
-				'url' => $this->piVars['url'],
-				'bodytext' => $this->piVars['bodytext'],
-				'item_id' => $this->piVars['id'],
-				'crdate' => time()
-			);
-			
-				// Insert it
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
-				'tx_blogs_comments',
-				$insertFields
-			);	
+				// Check for empty fields
+			if(empty($this->piVars['name']) || empty($this->piVars['email']) || empty($this->piVars['url']) || empty($this->piVars['bodytext'])) 
+				$error = $this->pi_getLL('empty_fields');
+				
+				// Email check
+			if(!t3lib_div::validEmail($this->piVars['email'])) $error = $this->pi_getLL('invalid_email');	
+				
+				// Error check
+			if(!empty($error)) { 
+					// Build insert array
+				$insertFields = array(
+					'name' => $this->piVars['name'],
+					'pid' => $this->blogStorage,
+					'email' => $this->piVars['email'],
+					'url' => $this->piVars['url'],
+					'bodytext' => $this->piVars['bodytext'],
+					'item_id' => $this->piVars['id'],
+					'crdate' => time()
+				);
+				
+					// Insert it
+				$GLOBALS['TYPO3_DB']->exec_INSERTquery(
+					'tx_blogs_comments',
+					$insertFields
+				);	
+			}
 		}
 	
 			// Select the specified item
@@ -271,7 +284,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 					$markerArray = array(
 						'###NAME###' => htmlspecialchars($comment['name']),
 						'###URL###' => htmlspecialchars($comment['url']),
-						'###COMMENT_DATE###' => date('j F Y @ G:i', $comment['crdate']),
+						'###COMMENT_DATE###' => date($this->conf['singleView.']['comments.']['dateFormat'], $comment['crdate']),
 						'###BODYTEXT###' => htmlspecialchars($comment['bodytext']),
 						'###ODD_EVEN###' => $oddEven
 					);
@@ -281,6 +294,20 @@ class tx_blogs_pi1 extends tslib_pibase {
 			} else {
 					// No comments found, leave comment subpart empty
 				$subpartArray['###COMMENT_SUBPART###'] = '';
+			}
+			
+				// Init error subpart
+			 $subpartArray['###ERROR_SUBPART###'] = '';
+			 
+				// Check if there was a form error
+			if(!empty($error)) {
+					// Get ERROR subpart
+				$errorPart = $this->cObj->getSubpart($template, '###ERROR_SUBPART###');
+					// Fill array marker
+				$markerArray = array('###ERROR###' => $error);
+				
+					// Substitute to subpart
+				$subpartArray['###ERROR_SUBPART###'] = $this->cObj->substituteMarkerArrayCached($errorPart, $markerArray);
 			}
 		
 				// Create array out of the comma seperated tags
@@ -296,7 +323,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###TITLE###' => $result[0]['title'],
 				'###AUTHOR_EMAIL###' => $result[0]['author_emai l'],
 				'###AUTHOR###' => $result[0]['author'],
-				'###DATE###' => str_replace('%s', date('j F Y', $result[0]['crdate']), $this->pi_getLL('posted_header')),
+				'###DATE###' => str_replace('%s', date($this->conf['singleView.']['dateFormat'], $result[0]['crdate']), $this->pi_getLL('posted_header')),
 				'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result[0]['category_id']))),
 				'###CATEGORY###' => $result[0]['category_title'],
 				'###COMMENTS_LINK###' => '#comments',		
@@ -309,6 +336,10 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###NAME_LABEL###' => $this->pi_getLL('name_label'),
 				'###EMAIL_LABEL###' => $this->pi_getLL('email_label'),
 				'###URL_LABEL###' => $this->pi_getLL('url_label'),
+				'###NAME_VALUE###' => (isset($this->piVars['name'])) ? htmlspecialchars($this->piVars['name']) : '',
+				'###EMAIL_VALUE###' => (isset($this->piVars['email'])) ? htmlspecialchars($this->piVars['email']) : '',
+				'###URL_VALUE###' => (isset($this->piVars['url'])) ? htmlspecialchars($this->piVars['url']) : '',
+				'###BODYTEXT_VALUE###' => (isset($this->piVars['bodytext'])) ? htmlspecialchars($this->piVars['bodytext']) : '',
 				'###SUBMIT_COMMENT###' => $this->pi_getLL('submit_comment_label')
 			);
 			
@@ -319,7 +350,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 					// Otherwise, leave this empty
 				$subpartArray['###CAPTCHA_INSERT###'] = '';
 			}
-			
+				
 				// Substitute the whole thing
 			$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 			
@@ -477,7 +508,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			$minFontSize = (isset($this->conf['tagCloud.']['minFontSize'])) ? $this->conf['tagCloud.']['minFontSize'] : 8;
 			$maxFontSize = (isset($this->conf['tagCloud.']['maxFontSize'])) ? $this->conf['tagCloud.']['maxFontSize'] : 18;
 				// Determine difference
-			$difference = ($maxFontSize +1) - ($minFontSize + 1); 	
+			$difference = ($maxFontSize + 1) - ($minFontSize + 1); 	
 				// Find highest occurance
 			$highestOccurance = max($tagArray);	
 				// only select the amount specified by maxTags in TypoScript

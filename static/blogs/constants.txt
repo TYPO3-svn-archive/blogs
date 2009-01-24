@@ -8,6 +8,21 @@ plugin.tx_blogs_pi1 {
 	# cat=plugin.blogs: Basic; type=int+; label=Results per page
 	resultsPerPage = 5
 
+	listView {
+		# cat=plugin.blogs: Basic; type=int+; label=Date format in listview
+		dateFormat = j F Y
+	}
+	
+	singleView {
+		# cat=plugin.blogs: Basic; type=int+; label=Date format in singleview
+		dateFormat = j F Y
+		
+		comments {
+			# cat=plugin.blogs: Basic; type=int+; label=Date format for comments
+			dateFormat = j F Y @ G:i
+		}
+	}
+
 	tagCloud {
 		# cat=plugin.blogs: Basic; type=int+; label=Amount of tags in tagcloud
 		maxTags = 20
