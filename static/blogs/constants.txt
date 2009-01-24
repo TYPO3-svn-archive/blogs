@@ -11,6 +11,9 @@ plugin.tx_blogs_pi1 {
 	listView {
 		# cat=plugin.blogs: Basic; type=int+; label=Date format in listview
 		dateFormat = j F Y
+		
+		# cat=plugin.blogs: Basic; type=int+; label=RSS feed link on listview
+		includeRSSFeed = 1
 	}
 	
 	singleView {

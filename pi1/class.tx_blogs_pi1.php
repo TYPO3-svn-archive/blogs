@@ -181,6 +181,11 @@ class tx_blogs_pi1 extends tslib_pibase {
 			
 				/// To do: pagebrowser
 			$markerArray = array('###PAGE_BROWSER###' => '');
+			
+				// Check if RSS feed is enabled
+			if($this->conf['listView.']['includeRSSFeed']) {
+				// TO DO
+			}
 				// Substitute the whole thing
 			$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 		} else {
@@ -188,6 +193,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			return $this->pi_getLL('no_listview_items_found');
 		}
 	
+
 		return $content;
 	}
 	
@@ -207,9 +213,9 @@ class tx_blogs_pi1 extends tslib_pibase {
 				// Instantiate
 			$this->freeCap = t3lib_div::makeInstance('tx_srfreecap_pi2');
 		}				
-		
+	
 			// Init error
-			$error = '';
+		$error = '';
 			
 			// Comment form handler
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -321,7 +327,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				// Now fill the markerArray with the item data
 			$markerArray = array(
 				'###TITLE###' => $result[0]['title'],
-				'###AUTHOR_EMAIL###' => $result[0]['author_emai l'],
+				'###AUTHOR_EMAIL###' => $result[0]['author_email'],
 				'###AUTHOR###' => $result[0]['author'],
 				'###DATE###' => str_replace('%s', date($this->conf['singleView.']['dateFormat'], $result[0]['crdate']), $this->pi_getLL('posted_header')),
 				'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result[0]['category_id']))),

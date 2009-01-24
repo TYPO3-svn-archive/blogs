@@ -13,6 +13,7 @@ plugin.tx_blogs_pi1 {
 
 	listView {
 		dateFormat = {$plugin.tx_blogs_pi1.listView.dateFormat}
+		includeRSSFeed = {$plugin.tx_blogs_pi1.listView.includeRSSFeed}
 	}
 	
 	singleView {
