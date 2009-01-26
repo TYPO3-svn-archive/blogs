@@ -1,0 +1,24 @@
+# Blog XML part
+
+blogXML = PAGE
+blogXML {
+	typeNum = 555
+	
+	config {
+		disableAllHeaderCode = 1
+		additionalHeaders = Content-type:application/xml
+		xhtml_cleaning = 0
+		admPanel = 0
+	}	
+	
+	10 < plugin.tx_blogs_pi1
+	
+	# Blog settings
+	10.templateFile = {$blogXML.10.templateFile}
+	10.maxItemsInFeed = {$blogXML.10.maxItemsInFeed}
+	
+	# Descriptive blog stuff
+	10.blogTitle = My Personal Blog
+	10.blogDescription = I blog about all kinds of fun stuff!
+	10.blogLink = http://www.myblog.com/
+}

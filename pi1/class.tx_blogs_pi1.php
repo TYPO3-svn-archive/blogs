@@ -55,13 +55,17 @@ class tx_blogs_pi1 extends tslib_pibase {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 		
+			// Check if we need to show RSS feed
+		$type = t3lib_div::_GP('type');
+		if(isset($type) && $type == $this->conf['rssTypeNum'] && $this->conf['enableRSSFeed']) return $this->rssView();
+		
 			// Get Flexform
 		$this->pi_initPIflexForm();	
-
-			// Check configuration, we need at least a storage container specified
-		$this->blogStorage = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'BlogStorage');
-		if(empty($this->blogStorage)) return $this->pi_getLL('no_storage_selected');
 		
+			// Check configuration, we need at least a storage container specified
+		$this->blogStorage = $this->conf['blogStorage'];
+		if(empty($this->blogStorage)) return $this->pi_getLL('no_storage_selected');
+			
 			// .. and a Template
 		if(!isset($this->conf['templateFile'])) return $this->pi_getLL('no_static_template');
 		$this->templateFile = $this->cObj->fileResource($this->conf['templateFile']);
@@ -72,7 +76,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			// Get content
 		$content = $this->whatToShow();
 
-		return $this->pi_wrapInBaseClass($content);
+		return $content;
 	}
 	
 	/**
@@ -81,6 +85,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 	 * @return	string		The content that is displayed on the website
 	 */
 	protected function whatToShow() {
+
 		$whatToShow = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'WhatToShow');	
 		switch($whatToShow) {
 			case('single');
@@ -100,7 +105,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				$content = $this->pi_getLL('no_type_selected');
 		}
 		
-		return $content;
+		return $this->pi_wrapInBaseClass($content);
 	}
 	
 	/**
@@ -110,10 +115,8 @@ class tx_blogs_pi1 extends tslib_pibase {
 	 * @return	string		The listview
 	 */
 	protected function listView() {
-			// Check configuration, we need to know what the singleview page will be
-		$singleView = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'SingleView');;
-		if(!isset($singleView)) return $this->pi_getLL('no_singleview_page_selected');
-		
+		if(empty($this->conf['singleViewPage'])) return $this->pi_getLL('no_singleview_page_selected');
+				
 			// Initialise
 		$filter = '';
 		
@@ -137,7 +140,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 			tx_blogs_items.tags, tx_blogs_items.crdate, tx_blogs_categories.uid AS category_id, tx_blogs_categories.title AS category_title',
 			'tx_blogs_items, tx_blogs_categories',
 			'tx_blogs_items.category = tx_blogs_categories.uid AND tx_blogs_items.pid = '.$this->blogStorage.' AND tx_blogs_categories.pid = '.$this->blogStorage .  
-			$this->cObj->enableFields('tx_blogs_items') . $filter,
+			$this->cObj->enableFields('tx_blogs_items') . $this->cObj->enableFields('tx_blogs_categories') . $filter,
 			'',
 			'crdate DESC',
 			$this->conf['resultsPerPage']
@@ -168,31 +171,40 @@ class tx_blogs_pi1 extends tslib_pibase {
 					'###AUTHOR_EMAIL###' => $result['author_email'],
 					'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result['category_id']))),
 					'###CATEGORY###' => $result['category_title'],
-					'###COMMENTS_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid']))).'#comments', 
+					'###COMMENTS_LINK###' => $this->pi_getPageLink($this->conf['singleViewPage'], '', array($this->prefixId => array('itemid' => $result['uid']))).'#comments', 
 					'###AUTHOR###' => $result['author'], 
 					'###DATE###' => str_replace('%s', date($this->conf['listView.']['dateFormat'], $result['crdate']), $this->pi_getLL('posted_header')),
 					'###TEASER###' => $result['teaser'],
 					'###READ_MORE_LABEL###' => $this->pi_getLL('read_more_label'),
-					'###READ_MORE_LINK###' => $this->pi_getPageLink($singleView, '', array($this->prefixId => array('itemid' => $result['uid'])))
+					'###READ_MORE_LINK###' => $this->pi_getPageLink($this->conf['singleViewPage'], '', array($this->prefixId => array('itemid' => $result['uid'])))
 				);
 					// Substitute it
  				$subpartArray['###ITEM_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($items, $markerArray);
 			}
+
+				// RSS subpart
+			$rss = $this->cObj->getSubpart($template, '###RSS_LINK_SUBPART###');
+			$subpartArray['###RSS_LINK_SUBPART###'] = '';
+			
+				// Check if RSS is enabled
+			if($this->conf['enableRSSFeed'] == 1) {
+				$markerArray = array(
+					'###RSS_LABEL###' => $this->pi_getLL('rss_label'),
+					'###RSS_LINK###' => $this->pi_getPageLink($GLOBALS['TSFE']->id, '', array('type' => $this->conf['rssTypeNum']))
+				);
+				
+				$subpartArray['###RSS_LINK_SUBPART###'] = $this->cObj->substituteMarkerArrayCached($rss, $markerArray);
+			}
 			
 				/// To do: pagebrowser
-			$markerArray = array('###PAGE_BROWSER###' => '');
+			$markerArray = array('###PAGE_BROWSER###' => '');			
 			
-				// Check if RSS feed is enabled
-			if($this->conf['listView.']['includeRSSFeed']) {
-				// TO DO
-			}
 				// Substitute the whole thing
 			$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 		} else {
 				// No items were found
 			return $this->pi_getLL('no_listview_items_found');
 		}
-	
 
 		return $content;
 	}
@@ -243,10 +255,10 @@ class tx_blogs_pi1 extends tslib_pibase {
 				);
 				
 					// Insert it
-				$GLOBALS['TYPO3_DB']->exec_INSERTquery(
+				if(!$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 					'tx_blogs_comments',
 					$insertFields
-				);	
+				))	return $this->pi_getLL('general_error');	
 			}
 		}
 	
@@ -291,7 +303,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 						'###NAME###' => htmlspecialchars($comment['name']),
 						'###URL###' => htmlspecialchars($comment['url']),
 						'###COMMENT_DATE###' => date($this->conf['singleView.']['comments.']['dateFormat'], $comment['crdate']),
-						'###BODYTEXT###' => htmlspecialchars($comment['bodytext']),
+						'###BODYTEXT###' => nl2br(htmlspecialchars($comment['bodytext'])),
 						'###ODD_EVEN###' => $oddEven
 					);
 						// Substitute to subpart
@@ -544,6 +556,65 @@ class tx_blogs_pi1 extends tslib_pibase {
 		}
 			// Substitute whole thing
 		$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray);
+		
+		return $content;
+	}
+	
+	/**
+	 * This method creates RSS feed of the blog. RSS has to be enabled in the listView options of the main TypoScript template!
+	 * Requires blogXML static template!
+	 * 
+	 * @return string		The RSS feed
+	 */
+	protected function rssView() {
+			// RSS view has its own TypoScript settings, fetch these now
+		$conf = $GLOBALS['TSFE']->tmpl->setup['blogXML.'];
+		if(!is_array($conf)) return $this->pi_getLL('no_xml_ts');
+
+		if(empty($conf['10.']['blogStorage']) || empty($conf['10.']['listViewPage']) || empty($conf['10.']['singleViewPage'])) return $this->pi_getLL('check_rss_configuration');
+		
+			// Get template
+		$mainTemplate = $this->cObj->fileResource($conf['10.']['templateFile']);
+		$template = $this->cObj->getSubpart($mainTemplate, '###RSS_TEMPLATE###');
+		
+			// Now fetch the items to put in the RSS feed
+		$results = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			'uid, title, teaser, crdate',
+			'tx_blogs_items',
+			'pid = '.$conf['10.']['blogStorage'] . $this->cObj->enableFields('tx_blogs_items'),
+			'',
+			'crdate DESC',
+			$conf['10.']['maxItemsInFeed']
+		);
+
+			// Result check
+		if(count($results)) {
+			$items = $this->cObj->getSubpart($template, '###ITEM_SUBPART###');
+			$subpartArray = array('###ITEM_SUBPART###' => '');
+					
+				// Loop through results
+			foreach($results as $result) {
+				$markerArray = array(
+					'###TITLE###' => $result['title'],
+					'###TEASER###' => $result['teaser'],
+					'###LINK###' => t3lib_div::getIndpEnv('TYPO3_SITE_URL') . str_replace('&', '&amp;', $this->pi_getPageLink($conf['10.']['singleViewPage'], '', array($this->prefixId => array('itemid' => $result['uid'])))),
+				);
+				
+				$subpartArray['###ITEM_SUBPART###'] .= $this->cObj->substituteMarkerArrayCached($items, $markerArray);
+			}		
+		} else {
+			$subpartArray['###ITEM_SUBPART###'] = '';
+		}
+		
+				// Fill markerArray
+		$markerArray = array(
+			'###XML_DECLARATION###' => '<?xml version="1.0" encoding="iso-8859-1"?>',
+			'###BLOG_TITLE###' => $conf['10.']['blogTitle'],
+			'###BLOG_DESCRIPTION###' => $conf['10.']['blogDescription'],
+			'###BLOG_LINK###' => $conf['10.']['blogLink']
+		);
+		
+		$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray, $subpartArray);
 		
 		return $content;
 	}

@@ -7,7 +7,6 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="settings.label">Settings</label>
-			<label index="settings.storage">Blog storage</label>
 			<label index="settings.view">What to show</label>
 			<label index="settings.listview">Listview</label>
 			<label index="settings.singleview">Singleview</label>
@@ -31,12 +30,16 @@
 			<label index="item_not_found">Blog entry not found</label>
 			<label index="no_tags_found">No tags found</label>
 			<label index="wrong_captcha">Captcha didnt match</label>
-			<label index="no_storage_selected">Please select the storage folder for the blog items in the Flexform.</label>
+			<label index="no_storage_selected">Please specify a storage folder for the Blogs in TypoScript</label>
 			<label index="no_static_template">Please include the static template 'Blogs' to your main template.</label>
 			<label index="no_type_selected">Please select what view to show in the Flexform.</label>
-			<label index="no_singleview_page_selected">Please select a singleview page in the Flexform.</label>
+			<label index="no_singleview_page_selected">Please specify a singleview page id in TypoScript.</label>
 			<label index="empty_fields">Some fields were missing</label>
 			<label index="invalid_email">This doesn't look like a valid email address</label>
+			<label index="general_error">Error while processing your comment</label>
+			<label index="rss_label">RSS feed</label>
+			<label index="no_xml_ts">Please add the TypoScript settings for blogXML. Refer to the manual for more information.</label>
+			<label index="check_rss_configuration">RSS hasn't been configured correctly! Please check if all the page id's are correct!</label>
 		</languageKey>
 	</data>
 </T3locallang>

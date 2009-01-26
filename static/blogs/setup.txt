@@ -1,4 +1,4 @@
-plugin.tx_blogs_pi1 = USER
+plugin.tx_blogs_pi1 = USER_INT
 plugin.tx_blogs_pi1 {
 	userFunc = tx_blogs_pi1->main
 
@@ -7,13 +7,24 @@ plugin.tx_blogs_pi1 {
 
 	# Page uid of list view page (empty = current page)
 	listViewPage = {$plugin.tx_blogs_pi1.listViewPage}
+	
+	# Page uid of singleview page
+	singleViewPage = {$plugin.tx_blogs_pi1.singleViewPage}
+
+	# Storage Folder with Blog items/categories
+	blogStorage = {$plugin.tx_blogs_pi1.blogStorage}
 
 	# Number of results per page
 	resultsPerPage = {$plugin.tx_blogs_pi1.resultsPerPage}
 
+	# Enable RSS feed 
+	enableRSSFeed = {$plugin.tx_blogs_pi1.enableRSSFeed}
+	
+	# RSS typeNum
+	rssTypeNum = {$plugin.tx_blogs_pi1.rssTypeNum}
+	
 	listView {
 		dateFormat = {$plugin.tx_blogs_pi1.listView.dateFormat}
-		includeRSSFeed = {$plugin.tx_blogs_pi1.listView.includeRSSFeed}
 	}
 	
 	singleView {

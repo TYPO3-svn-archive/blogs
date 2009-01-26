@@ -1,0 +1,7 @@
+blogXML {
+	# cat=plugin.blogs: Basic; type=int+; label=RSS template file
+	10.templateFile = EXT:blogs/pi1/template_rss.html
+	
+	# cat=plugin.blogs: Basic; type=int+; label=Max items to be shown in feed
+	10.maxItemsInFeed = 10
+}

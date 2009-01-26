@@ -3,17 +3,26 @@ plugin.tx_blogs_pi1 {
 	templateFile = EXT:blogs/pi1/template.html
 
 	# cat=plugin.blogs: Basic; type=int+; label=Page id where the listview is located
-	listViewPage =
+	listViewPage = 
+	
+	# cat=plugin.blogs: Basic; type=int+; label=Page id where the singleview is located
+	singleViewPage = 
+	
+	# cat=plugin.blogs: Basic; type=int+; label=ID of the storage folder
+	blogStorage =
 
 	# cat=plugin.blogs: Basic; type=int+; label=Results per page
 	resultsPerPage = 5
 
+	# cat=plugin.blogs: Basic; type=int+; label=Enable RSS Feed
+	enableRSSFeed = 1
+	
+	# cat=plugin.blogs: Basic; type=int+; label=typeNum for the RSS page
+	rssTypeNum = 555
+
 	listView {
 		# cat=plugin.blogs: Basic; type=int+; label=Date format in listview
 		dateFormat = j F Y
-		
-		# cat=plugin.blogs: Basic; type=int+; label=RSS feed link on listview
-		includeRSSFeed = 1
 	}
 	
 	singleView {

@@ -21,12 +21,12 @@
 		   	 	<type>select</type>
 		    	<items type="array">
 			 		<numIndex index="0" type="array">
-				    	<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.listview</numIndex>
-				 		<numIndex index="1">list</numIndex>
-			 		</numIndex>
-			 		<numIndex index="1" type="array">
 				    	<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.singleview</numIndex>
 				 		<numIndex index="1">single</numIndex>
+			 		</numIndex>
+			 		<numIndex index="1" type="array">
+				    	<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.listview</numIndex>
+				 		<numIndex index="1">list</numIndex>
 			 		</numIndex>
 			 		<numIndex index="2" type="array">
 			 			<numIndex index="0">LLL:EXT:blogs/pi1/locallang.xml:settings.archive</numIndex>
@@ -39,20 +39,7 @@
 				</items>
 			</config>
       	</TCEforms>
-      </WhatToShow>
-      
-      <BlogStorage>
-      	<TCEforms>
-      		<label>LLL:EXT:blogs/pi1/locallang.xml:settings.storage</label>
-      		 <config>
-      		 	<type>group</type>
-      			<internal_type>db</internal_type>
-      			<allowed>pages</allowed>
-      			<size>1</size>
-      			<maxitems>1</maxitems>   
-      		</config>
-      	</TCEforms>
-      </BlogStorage>    		  	
+      </WhatToShow>    		  	
       
       <SingleView>
       	<TCEforms>
