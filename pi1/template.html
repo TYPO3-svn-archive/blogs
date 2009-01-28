@@ -5,8 +5,9 @@
 		start -->
 	<div class="blogs_teaserContainer">
 		<h2>###TITLE###</h2>
-		<div class="blogs_entryInfo">
-			<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> ###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a> <a href="###COMMENTS_LINK###">###COMMENTS###</a>
+		<div class="blogs_entryInfoWrap">
+			<div class="blogs_entryInfo"><!--<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a>-->###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a></div>
+			<div class="blogs_comments"><a href="###COMMENTS_LINK###">(###COMMENTS###)</a></div>
 		</div>
 		<div class="blogs_bodyText">###TEASER###</div>
 		<div class="blogs_readMoreLink"><a href="###READ_MORE_LINK###">###READ_MORE_LABEL###</a></div>
@@ -41,8 +42,9 @@
 	<!-- ###ERROR_SUBPART### -->
 	<div class="blogs_entryContainer">
 		<h2>###TITLE###</h2>
-		<div class="blogs_entryInfo">
-			<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> ###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a> <a href="###COMMENTS_LINK###">###COMMENTS###</a>
+		<div class="blogs_entryInfoWrap">
+			<div class="blogs_entryInfo"><!--<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> -->###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a></div>
+			<div class="blogs_comments"><a href="###COMMENTS_LINK###">###COMMENTS###</a></div>
 		</div>
 		<div class="blogs_bodyText">###BODYTEXT###</div>
 		<div class="blogs_Tags">###TAGS###</div>
@@ -96,7 +98,7 @@
 <!-- ###ARCHIVEVIEW### 
  	start -->
  	
-	<div class="blog_archiveWrap">
+	<div class="blogs_archiveWrap">
 		
 		<h2>###ARCHIVE_HEADER###</h2>
 		<ul>
@@ -127,8 +129,10 @@
 	
 <!-- ###TAGCLOUDVIEW###
 	start -->
-	
-	<div class="blog_tagCloud">
+
+		
+	<div class="blogs_tagCloud">
+		<h2>###TAGCLOUD_HEADER###</h2>
 		###TAGS###
 	</div>
 	

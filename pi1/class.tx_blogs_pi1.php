@@ -554,6 +554,8 @@ class tx_blogs_pi1 extends tslib_pibase {
 				// No results
 			$markerArray['###TAGS###'] = $this->pi_getLL('no_tags_found');
 		}
+			// Header
+		$markerArray['###TAGCLOUD_HEADER###'] = $this->pi_getLL('tagcloud_header');
 			// Substitute whole thing
 		$content = $this->cObj->substituteMarkerArrayCached($template, $markerArray);
 		

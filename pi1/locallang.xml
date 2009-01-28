@@ -14,7 +14,7 @@
 			<label index="settings.tagcloud">Tagcloud</label>
 			<label index="settings.singleviewpage">Singleview page</label>
 			<label index="posted_header">posted on %s in</label>	
-			<label index="read_more_label">Read full article</label>
+			<label index="read_more_label">read full article &gt;&gt;</label>
 			<label index="name_label">Name:</label>
 			<label index="email_label">Email:</label>
 			<label index="url_label">Website:</label>
@@ -24,6 +24,7 @@
 			<label index="comments_header_single">%s comment has been posted</label>
 			<label index="comments_header">%s comments have been posted</label>
 			<label index="category_header">Categories</label>
+			<label index="tagcloud_header">Tagcloud</label>
 			<label index="archive_header">Archive</label>
 			<label index="tags">Tags: %s</label>
 			<label index="no_listview_items_found">No blog entries found</label>
