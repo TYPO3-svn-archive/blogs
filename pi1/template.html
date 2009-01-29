@@ -36,11 +36,13 @@
 	
 <!-- ###SINGLEVIEW###
 	start -->
-	<!-- ###ERROR_SUBPART### 
-		start -->
-		<div class="blogs_errorMessage">###ERROR###</div>
-	<!-- ###ERROR_SUBPART### -->
+	
 	<div class="blogs_entryContainer">
+		<!-- ###ERROR_SUBPART### 
+			start -->
+			<div class="blogs_errorMessage">###ERROR###</div>
+		<!-- ###ERROR_SUBPART###
+			end -->
 		<h2>###TITLE###</h2>
 		<div class="blogs_entryInfoWrap">
 			<div class="blogs_entryInfo"><!--<a href="mailto:###AUTHOR_EMAIL###">###AUTHOR###</a> -->###DATE### <a href="###CATEGORY_LINK###">###CATEGORY###</a></div>
@@ -70,15 +72,13 @@
 				<label for="tx_blogs_pi1_name">###NAME_LABEL###</label><input name="tx_blogs_pi1[name]" id="tx_blogs_pi1_name" value="###NAME_VALUE###" /><br />
 				<label for="tx_blogs_pi1_email">###EMAIL_LABEL###</label><input name="tx_blogs_pi1[email]" id="tx_blogs_pi1_email" value="###EMAIL_VALUE###" /><br />
 				<label for="tx_blogs_pi1_url">###URL_LABEL###</label><input name="tx_blogs_pi1[url]" id="tx_blogs_pi1_url" value="###URL_VALUE###" /><br />
-				<textarea rows="10" cols="30" name="tx_blogs_pi1[bodytext]">###BODYTEXT_VALUE###</textarea><br />
+				<textarea rows="10" cols="33" name="tx_blogs_pi1[bodytext]">###BODYTEXT_VALUE###</textarea><br />
 				
 				<!--###CAPTCHA_INSERT### 
 					start -->
+				###SR_FREECAP_IMAGE###<br />
 				<label for="tx_blogs_pi1_captcha_response">###SR_FREECAP_NOTICE###</label>
-				###SR_FREECAP_CANT_READ###
-				<br />
-				<input type="text" size="15" id="tx_blogs_pi1_captcha_response" name="tx_blogs_pi1[captcha_response]" title="###SR_FREECAP_NOTICE###">###SR_FREECAP_IMAGE###<br />
-				###SR_FREECAP_ACCESSIBLE###
+				<input type="text" id="tx_blogs_pi1_captcha_response" name="tx_blogs_pi1[captcha_response]" title="###SR_FREECAP_NOTICE###" />###SR_FREECAP_CANT_READ###<br />
 				<!-- ###CAPTCHA_INSERT### 
 					end -->
 				

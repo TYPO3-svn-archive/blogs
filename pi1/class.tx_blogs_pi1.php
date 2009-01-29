@@ -240,9 +240,9 @@ class tx_blogs_pi1 extends tslib_pibase {
 				
 				// Email check
 			if(!t3lib_div::validEmail($this->piVars['email'])) $error = $this->pi_getLL('invalid_email');	
-				
+			
 				// Error check
-			if(!empty($error)) { 
+			if(empty($error)) { 
 					// Build insert array
 				$insertFields = array(
 					'name' => $this->piVars['name'],
