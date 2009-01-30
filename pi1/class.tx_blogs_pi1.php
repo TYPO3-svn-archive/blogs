@@ -239,7 +239,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				$error = $this->pi_getLL('empty_fields');
 				
 				// Email check
-			if(!t3lib_div::validEmail($this->piVars['email'])) $error = $this->pi_getLL('invalid_email');	
+			if(!empty($this->piVars['email'])) if(!t3lib_div::validEmail($this->piVars['email'])) $error = $this->pi_getLL('invalid_email');	
 			
 				// Error check
 			if(empty($error)) { 
@@ -344,7 +344,7 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###DATE###' => str_replace('%s', date($this->conf['singleView.']['dateFormat'], $result[0]['crdate']), $this->pi_getLL('posted_header')),
 				'###CATEGORY_LINK###' => $this->pi_getPageLink($this->listViewPage, '', array($this->prefixId => array('categoryid' => $result[0]['category_id']))),
 				'###CATEGORY###' => $result[0]['category_title'],
-				'###COMMENTS_LINK###' => '#comments',		
+				'###COMMENTS_LINK###' => $this->pi_getPageLink($GLOBALS['TSFE']->id, '', array($this->prefixId => array('itemid' => $result[0]['uid']))).'#comments',		
 				'###COMMENTS###' => (count($results) == 1) ? str_replace('%s', count($results), $this->pi_getLL('comments_link_single')) : str_replace('%s', count($results), $this->pi_getLL('comments_link')),
 				'###COMMENTS_HEADER###' => (count($results) == 1) ? str_replace('%s', count($results), $this->pi_getLL('comments_header_single')) : str_replace('%s', count($results), $this->pi_getLL('comments_header')),
 				'###TAGS###' => str_replace('%s', implode(', ', $tags), $this->pi_getLL('tags')),
@@ -354,10 +354,11 @@ class tx_blogs_pi1 extends tslib_pibase {
 				'###NAME_LABEL###' => $this->pi_getLL('name_label'),
 				'###EMAIL_LABEL###' => $this->pi_getLL('email_label'),
 				'###URL_LABEL###' => $this->pi_getLL('url_label'),
-				'###NAME_VALUE###' => (isset($this->piVars['name'])) ? htmlspecialchars($this->piVars['name']) : '',
-				'###EMAIL_VALUE###' => (isset($this->piVars['email'])) ? htmlspecialchars($this->piVars['email']) : '',
-				'###URL_VALUE###' => (isset($this->piVars['url'])) ? htmlspecialchars($this->piVars['url']) : '',
-				'###BODYTEXT_VALUE###' => (isset($this->piVars['bodytext'])) ? htmlspecialchars($this->piVars['bodytext']) : '',
+				'###NAME_VALUE###' => (isset($this->piVars['name']) && isset($error) && !empty($error)) ? htmlspecialchars($this->piVars['name']) : '',
+				'###EMAIL_VALUE###' => (isset($this->piVars['email']) & isset($error) && !empty($error)) ? htmlspecialchars($this->piVars['email']) : '',
+				'###URL_VALUE###' => (isset($this->piVars['url']) && isset($error) && !empty($error)) ? htmlspecialchars($this->piVars['url']) : '',
+				'###BODYTEXT_VALUE###' => (isset($this->piVars['bodytext']) && isset($error) && !empty($error)) ? htmlspecialchars($this->piVars['bodytext']) : '',
+
 				'###SUBMIT_COMMENT###' => $this->pi_getLL('submit_comment_label')
 			);
 			
