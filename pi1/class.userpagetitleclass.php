@@ -1,13 +1,5 @@
 <?php
-/**
- * This is probably not the best way to do this, it would be way more efficient to do this in TypoScript.
- * 
- * Unfortunately, my knowledge of TypoScript doesn't run that deep as of yet, so this is just an easy way to do it for me
- * 
- * If anyone knows how to do it in TypoScript and wants to help me out, let me know!
- *
- * Note: won't work properly when cache is enabled on the target page, trying to fix this.
- */
+
 class user_pagetitle_class {
 
 	/**
@@ -26,14 +18,14 @@ class user_pagetitle_class {
 			if(array_key_exists('itemid', $getVar)) {
 				$itemId = $this->findTitle();
 				$title = &$itemId[0]['title'];
-				$title = $title.': Jesper Paardekooper\'s Blog';		
+				$title = $title.': My Blog';		
 			}
 
 				// Check for blog category
 			if(array_key_exists('categoryid', $getVar)) {	
 				$catId = $this->findCategory();
 				$title = &$catId[0]['title'];
-				$title = $title.': Jesper Paardekooper\'s Blog';				
+				$title = $title.': My Blog';				
 			}	
 		}
 
